@@ -1,0 +1,59 @@
+# Email Automation API - Git Ignore File
+
+# ============================================================================
+# SENSITIVE FILES - NEVER COMMIT THESE!
+# ============================================================================
+
+# Environment files with credentials and secrets
+.env
+.env.local
+.env.production
+.env.*.local
+*.env
+
+# Logs and application data
+logs/
+*.log
+log/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3

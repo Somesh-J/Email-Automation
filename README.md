@@ -1,207 +1,250 @@
-# Email Automation FastAPI Application
+# � Email Automation API
 
-A modern, scalable email automation system built with FastAPI, supporting both PostgreSQL and MongoDB databases.
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-6.0+-green.svg)](https://www.mongodb.com/)
 
-## Features
+A production-ready email automation system built with FastAPI and MongoDB, featuring AI-powered auto-replies, bulk email sending, and comprehensive email management.
 
-- **Multi-Database Support**: Choose between PostgreSQL (SQLAlchemy) or MongoDB (Beanie ODM)
-- **Email Processing**: IMAP email monitoring, parsing, and automatic responses
-- **AI Integration**: AI-powered email replies using Google Gemini or OpenAI
-- **Bulk Email**: Send bulk emails with template support and job tracking
-- **Domain Management**: Manage allowed/blocked domains with custom rules
-- **Monitoring**: Real-time system health monitoring and analytics
-- **Template System**: Customizable email templates with variable support
-- **API Security**: API key authentication, rate limiting, and CORS support
-- **Analytics**: Comprehensive email analytics and reporting
+## ✨ Key Features
 
-## Database Support
+- 📧 **Email Management** - IMAP integration for receiving emails, SendGrid/Resend for sending
+- 🤖 **AI Auto-Replies** - Powered by Google Gemini or OpenAI
+- 🎯 **Domain Whitelist/Blacklist** - Control who can interact with your system
+- 📬 **Bulk Email Sending** - Send to thousands with template support
+- 📊 **Analytics & Monitoring** - Real-time dashboards and email metrics
+- 🔒 **Secure** - API key authentication with rate limiting
 
-### PostgreSQL (Default)
-- Uses SQLAlchemy with async support
-- Structured relational data with ACID compliance
-- Automatic table creation and migrations
+## 🚀 Quick Start
 
-### MongoDB
-- Uses Beanie ODM (async MongoDB object document mapper)
-- Flexible document-based storage
-- Automatic index creation and data validation
-
-## Quick Start
-
-### 1. Environment Setup
-
-Create a `.env` file in the project root:
-
-```env
-# Database Configuration
-USE_MONGODB=false  # Set to true for MongoDB, false for PostgreSQL
-
-# PostgreSQL Settings (if USE_MONGODB=false)
-DATABASE_URL=postgresql://user:password@localhost:5432/email_automation
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=email_automation
-DB_USER=postgres
-DB_PASSWORD=password
-
-# MongoDB Settings (if USE_MONGODB=true)
-MONGO_URL=mongodb://localhost:27017/email_automation
-MONGO_HOST=localhost
-MONGO_PORT=27017
-MONGO_DB_NAME=email_automation
-MONGO_USERNAME=
-MONGO_PASSWORD=
-MONGO_AUTH_DB=admin
-MONGO_USE_SSL=false
-
-# Email Configuration
-IMAP_SERVER=imap.gmail.com
-IMAP_PORT=993
-IMAP_USE_SSL=true
-IMAP_USERNAME=your-email@gmail.com
-IMAP_PASSWORD=your-app-password
-
-# SendGrid Configuration
-SENDGRID_API_KEY=your-sendgrid-api-key
-FROM_EMAIL=noreply@yourdomain.com
-FROM_NAME=Your App Name
-
-# AI Configuration
-AI_PROVIDER=gemini  # or openai
-GEMINI_API_KEY=your-gemini-api-key
-OPENAI_API_KEY=your-openai-api-key
-
-# Security
-SECRET_KEY=your-secret-key-change-in-production
-VALID_API_KEYS=["key1", "key2", "key3"]
-
-# App Configuration
-DEBUG=false
-HOST=0.0.0.0
-PORT=8000
-```
-
-### 2. Installation
+### 1. Clone & Install
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd email-automation
+git clone https://github.com/Somesh-J/Email-Automation.git
+cd Email-Automation
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
-
-# Set up database (choose one)
-
-# For PostgreSQL:
-# Create database and user
-sudo -u postgres psql
-CREATE DATABASE email_automation;
-CREATE USER email_user WITH PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE email_automation TO email_user;
-
-# For MongoDB:
-# Install MongoDB and start the service
-sudo systemctl start mongod
-sudo systemctl enable mongod
 ```
 
-### 3. Run the Application
+### 2. Configure Environment
 
 ```bash
-# Start the FastAPI server
-python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+# Copy the example environment file
+copy .env.example .env
 
-# Or use the provided script
+# Edit .env with your credentials
+notepad .env
+```
+
+**Required Configuration:**
+
+```env
+# MongoDB
+MONGO_URL=mongodb+srv://user:pass@cluster.mongodb.net/
+
+# Email Provider (choose one: resend or sendgrid)
+EMAIL_PROVIDER=resend
+RESEND_API_KEY=re_your_api_key_here
+# OR
+# SENDGRID_API_KEY=SG.your_api_key_here
+
+# Email Settings
+FROM_EMAIL=your-email@yourdomain.com
+FROM_NAME=Your Name
+
+# IMAP (for receiving emails)
+IMAP_USERNAME=your-email@gmail.com
+IMAP_PASSWORD=your-16-char-app-password
+
+# AI (optional)
+GEMINI_API_KEY=your-gemini-api-key
+
+# Security
+VALID_API_KEYS=["dev-key-123","test-key-456","prod-key-789"]
+```
+
+> **📖 Email Provider Setup:** See [EMAIL_PROVIDER_GUIDE.md](EMAIL_PROVIDER_GUIDE.md) for detailed instructions on setting up Resend or SendGrid.
+
+### 3. Verify Setup
+
+```bash
+python test_setup.py
+```
+
+This checks all configurations and sends test emails to verify everything works.
+
+### 4. Start the Server
+
+```bash
 python main.py
 ```
 
-The application will be available at:
-- API: http://localhost:8000
-- Interactive Docs: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
-- **Bulk Operations:** `/api/v1/bulk/`
-- **Analytics:** `/api/v1/analytics/`
-- **Health Checks:** `/api/v1/health/`
-- **Settings:** `/api/v1/settings/`
+The API will be available at:
+- **API**: http://localhost:8000
+- **Docs**: http://localhost:8000/docs
+- **Health**: http://localhost:8000/api/v1/health/status
 
-## Configuration
+## 📚 API Endpoints
 
-Set up environment variables in `.env`:
+### Core Endpoints
+
+```http
+# Email Management
+POST   /api/v1/email/ingest           # Receive email
+GET    /api/v1/email/list             # List emails
+POST   /api/v1/email/ai-reply         # Generate AI reply
+
+# Domain Management
+GET    /api/v1/domains/               # List domains
+POST   /api/v1/domains/               # Add domain
+
+# Bulk Email
+POST   /api/v1/bulk/send              # Send bulk emails
+GET    /api/v1/bulk/jobs              # List jobs
+
+# Monitoring
+GET    /api/v1/monitor/status         # Monitoring status
+POST   /api/v1/monitor/start          # Start monitoring
+
+# Health & Analytics
+GET    /api/v1/health/status          # System health
+GET    /api/v1/analytics/dashboard    # Dashboard stats
+```
+
+### Authentication
+
+All endpoints require an API key:
 
 ```bash
-# Database
-DATABASE_URL=sqlite:///./email_automation.db
-
-# Email Settings
-IMAP_SERVER=imap.gmail.com
-EMAIL_ADDRESS=your-email@example.com
-EMAIL_PASSWORD=your-password
-
-# AI Services
-AI_PROVIDER=gemini
-GEMINI_API_KEY=your-key
-
-# Security
-API_KEYS=["your-api-key"]
+curl -H "X-API-Key: your-api-key" \
+  http://localhost:8000/api/v1/domains/
 ```
 
-## Integration Example
+## � Usage Examples
 
-```python
-import requests
-
-# Configure client
-headers = {"X-API-Key": "your-api-key"}
-base_url = "http://localhost:8000/api/v1"
-
-# Ingest emails
-response = requests.post(f"{base_url}/emails/ingest", headers=headers)
-print(response.json())
-
-# Get analytics
-response = requests.get(f"{base_url}/analytics/overview", headers=headers)
-print(response.json())
-```
-
-## Development
+### Send Test Email
 
 ```bash
-# Install development dependencies
-pip install -r requirements.txt
-
-# Run with auto-reload
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-
-# Run tests
-pytest
+python send_test_email.py
 ```
 
-## Deployment
-
-### Docker
+### Send Bulk Email via API
 
 ```bash
-docker build -t email-automation .
-docker run -p 8000:8000 email-automation
+curl -X POST "http://localhost:8000/api/v1/bulk/send" \
+  -H "X-API-Key: dev-key-123" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Welcome Campaign",
+    "subject": "Welcome!",
+    "body": "Hello, thanks for joining!",
+    "recipients": ["user1@example.com", "user2@example.com"]
+  }'
 ```
 
-### Production
+### Add Allowed Domain
 
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+curl -X POST "http://localhost:8000/api/v1/domains/" \
+  -H "X-API-Key: dev-key-123" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "domain": "example.com",
+    "is_allowed": true,
+    "auto_reply_enabled": true
+  }'
 ```
 
-## License
+## 📁 Project Structure
+
+```
+Email-Automation/
+├── api/                      # API routes and models
+│   ├── models.py
+│   └── routes/
+├── core/                     # Core functionality
+│   ├── config.py            # Configuration
+│   ├── database.py          # MongoDB manager
+│   ├── mongo_models.py      # Data models
+│   ├── logger.py
+│   └── security.py
+├── services/                 # Business logic
+│   ├── ai_service.py
+│   ├── email_service.py
+│   ├── sendgrid_service.py
+│   ├── resend_service.py
+│   └── email_monitor.py
+├── .env.example             # Environment template
+├── main.py                  # Application entry
+├── requirements.txt
+├── test_setup.py           # Setup verification
+└── send_test_email.py      # Email testing tool
+```
+
+## �️ Technology Stack
+
+- **FastAPI** - Modern Python web framework
+- **MongoDB + Beanie** - NoSQL database with ODM
+- **Resend/SendGrid** - Email sending services
+- **Google Gemini/OpenAI** - AI-powered responses
+- **AIOIMAPLIB** - IMAP email receiving
+- **Pydantic V2** - Data validation
+
+## 📖 Documentation
+
+- **[EMAIL_PROVIDER_GUIDE.md](EMAIL_PROVIDER_GUIDE.md)** - Email provider setup (Resend/SendGrid)
+- **Interactive Docs** - http://localhost:8000/docs (when running)
+
+## 🔒 Security
+
+- ✅ API key authentication
+- ✅ Rate limiting
+- ✅ CORS configuration
+- ✅ Input validation
+- ✅ Secure credential storage (.env)
+
+**Important:** Never commit `.env` file or credentials to Git!
+
+## 🚀 Production Deployment
+
+1. Use MongoDB Atlas for database
+2. Set strong `SECRET_KEY` and API keys
+3. Enable HTTPS with reverse proxy
+4. Configure CORS for your domain
+5. Set up monitoring and alerts
+
+## 🧪 Testing
+
+```bash
+# Verify setup
+python test_setup.py
+
+# Send test emails
+python send_test_email.py
+
+# Interactive API testing
+# Visit http://localhost:8000/docs
+```
+
+## 🤝 Contributing
+
+Contributions welcome! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Submit a pull request
+
+## 📝 License
 
 MIT License - see LICENSE file for details.
 
-## Support
+## 👨‍💻 Author
 
-- 📖 **Documentation:** Available at `/docs` and `/redoc`
-- 🏥 **Health Checks:** `/api/v1/health/status`
-- 📊 **Metrics:** `/api/v1/health/metrics`
-
----
-
-Built with ❤️ By Somesh.
+**Somesh J**
+- GitHub: [@Somesh-J](https://github.com/Somesh-J)
+- Email: someshj777@gmail.com
+- linkedin: [Somesh J](https://www.linkedin.com/in/somesh-j/)

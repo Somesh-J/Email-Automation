@@ -73,6 +73,10 @@ class EmailAutomationLogger:
         """Log email received"""
         self.logger.info(f"EMAIL_RECEIVED: {sender} - {subject} - ID: {email_id}")
     
+    def log_email_sent(self, recipient: str, subject: str, provider: str = "unknown"):
+        """Log email sent"""
+        self.logger.info(f"EMAIL_SENT: {recipient} - {subject} - Provider: {provider}")
+    
     def log_email_replied(self, recipient: str, subject: str, reply_type: str = "auto"):
         """Log email replied"""
         self.logger.info(f"EMAIL_REPLIED: {recipient} - {subject} - Type: {reply_type}")

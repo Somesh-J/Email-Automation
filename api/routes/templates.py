@@ -12,7 +12,8 @@ from ..models import (
     EmailTemplateUpdate, TemplateListResponse
 )
 from core.security import verify_api_key, require_permissions
-from core.database import get_db, EmailTemplateDB
+from core.database import DatabaseManager
+from core.mongo_models import EmailTemplateMongo
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

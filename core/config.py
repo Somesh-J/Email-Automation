@@ -58,8 +58,16 @@ class Settings(BaseSettings):
     IMAP_USERNAME: str = ""
     IMAP_PASSWORD: str = ""
     
-    # Email Configuration - SMTP/SendGrid
+    # Email Provider Configuration
+    EMAIL_PROVIDER: str = "sendgrid"  # sendgrid or resend
+    
+    # SendGrid Configuration
     SENDGRID_API_KEY: str = ""
+    
+    # Resend Configuration
+    RESEND_API_KEY: str = ""
+    
+    # Email Settings (common for both providers)
     FROM_EMAIL: str = "noreply@example.com"
     FROM_NAME: str = "Email Automation"
     
@@ -157,15 +165,37 @@ class Settings(BaseSettings):
     def parse_api_keys(cls, v):
         """Parse API keys from environment variable"""
         if isinstance(v, str):
+            # Try to parse as JSON first
+            import json
+            try:
+                parsed = json.loads(v)
+                if isinstance(parsed, list):
+                    return parsed
+            except (json.JSONDecodeError, ValueError):
+                pass
+            # Fallback to comma-separated
             return [key.strip() for key in v.split(',') if key.strip()]
-        return v or []
+        elif isinstance(v, list):
+            return v
+        return []
     
     @validator('ALLOWED_ORIGINS', pre=True)
     def parse_allowed_origins(cls, v):
         """Parse allowed origins from environment variable"""
         if isinstance(v, str):
+            # Try to parse as JSON first
+            import json
+            try:
+                parsed = json.loads(v)
+                if isinstance(parsed, list):
+                    return parsed
+            except (json.JSONDecodeError, ValueError):
+                pass
+            # Fallback to comma-separated
             return [origin.strip() for origin in v.split(',') if origin.strip()]
-        return v or ["*"]
+        elif isinstance(v, list):
+            return v
+        return ["*"]
     
     class Config:
         env_file = ".env"

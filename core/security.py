@@ -12,8 +12,6 @@ from datetime import datetime, timedelta
 from passlib.context import CryptContext
 
 from .config import settings
-from .database import get_db, ApiKey
-from sqlalchemy.ext.asyncio import AsyncSession
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -71,8 +69,7 @@ class SecurityManager:
             return None
 
 async def verify_api_key(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
-    db: AsyncSession = Depends(get_db)
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
 ) -> dict:
     """Verify API key authentication"""
     
@@ -94,7 +91,7 @@ async def verify_api_key(
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    # Check against configured API keys first
+    # Check against configured API keys
     if api_key in settings.VALID_API_KEYS:
         return {
             "api_key": api_key,

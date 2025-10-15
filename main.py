@@ -36,7 +36,7 @@ from api.routes import (
     bulk_email,
     analytics,
     settings,
-    templates
+    # templates  # Temporarily disabled - needs MongoDB migration
 )
 
 # Import core services
@@ -186,11 +186,12 @@ app.include_router(
     tags=["Settings"]
 )
 
-app.include_router(
-    templates.router,
-    prefix="/api/v1/templates",
-    tags=["Templates"]
-)
+# Temporarily disabled - needs MongoDB migration
+# app.include_router(
+#     templates.router,
+#     prefix="/api/v1/templates",
+#     tags=["Templates"]
+# )
 
 # Root endpoint
 @app.get("/", tags=["Root"])

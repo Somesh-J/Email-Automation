@@ -136,7 +136,7 @@ class Domain(DomainBase):
     updated_at: Optional[datetime] = None
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Monitoring Models
 class MonitoringSettings(BaseModel):

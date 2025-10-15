@@ -149,9 +149,11 @@ class MonitoringStatusMongo(Document):
     """Monitoring status document for MongoDB"""
     
     service_name: str = Field(..., description="Service name")
-    is_active: bool = Field(default=False, description="Whether monitoring is active")
+    is_running: bool = Field(default=False, description="Whether monitoring is running")
+    start_time: Optional[datetime] = Field(None, description="Service start time")
     last_check: Optional[datetime] = Field(None, description="Last check timestamp")
-    next_check: Optional[datetime] = Field(None, description="Next scheduled check")
+    emails_processed: int = Field(default=0, description="Total emails processed")
+    emails_failed: int = Field(default=0, description="Total emails failed")
     check_interval: int = Field(default=30, description="Check interval in seconds")
     error_count: int = Field(default=0, description="Number of consecutive errors")
     last_error: Optional[str] = Field(None, description="Last error message")
@@ -164,7 +166,7 @@ class MonitoringStatusMongo(Document):
         name = "monitoring_status"
         indexes = [
             IndexModel([("service_name", ASCENDING)], unique=True),
-            IndexModel([("is_active", ASCENDING)]),
+            IndexModel([("is_running", ASCENDING)]),
             IndexModel([("last_check", DESCENDING)]),
             IndexModel([("health_status", ASCENDING)])
         ]
@@ -198,9 +200,9 @@ class APIKeyMongo(Document):
 class SystemSettingsMongo(Document):
     """System settings document for MongoDB"""
     
-    setting_key: str = Field(..., description="Setting key")
-    setting_value: Any = Field(..., description="Setting value")
-    data_type: str = Field(..., description="Data type (str, int, bool, float, list, dict)")
+    key: str = Field(..., description="Setting key")
+    value: Any = Field(..., description="Setting value")
+    data_type: str = Field(default="string", description="Data type (str, int, bool, float, list, dict)")
     description: Optional[str] = Field(None, description="Setting description")
     category: Optional[str] = Field(None, description="Setting category")
     is_encrypted: bool = Field(default=False, description="Whether value is encrypted")
@@ -211,7 +213,7 @@ class SystemSettingsMongo(Document):
     class Settings:
         name = "system_settings"
         indexes = [
-            IndexModel([("setting_key", ASCENDING)], unique=True),
+            IndexModel([("key", ASCENDING)], unique=True),
             IndexModel([("category", ASCENDING)]),
             IndexModel([("is_system", ASCENDING)])
         ]
